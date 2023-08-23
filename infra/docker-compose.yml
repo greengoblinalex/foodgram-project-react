@@ -1,17 +1,43 @@
 version: '3.3'
+
+volumes:
+  pg_data_production:
+  static_volume:
+  media_volume:
+
 services:
+  db:
+    image: postgres:13.10
+    env_file: .env
+    environment:
+      POSTGRES_PASSWORD: 140313
+    volumes:
+      - pg_data_production:/var/lib/postgresql/data
+
+  backend:
+    build: ../backend
+    env_file: .env
+    depends_on:
+    - db
+    volumes:
+      - static_volume:/backend_static
+      - media_volume:/app/media
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    build: ../frontend
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - ../frontend/:/app/result_build/
+      - static_volume:/frontend_static
+
   nginx:
     image: nginx:1.19.3
+    env_file: .env
     ports:
       - "80:80"
     volumes:
+      - static_volume:/staticfiles/
+      - media_volume:/media/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
