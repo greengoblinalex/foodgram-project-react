@@ -24,12 +24,11 @@ services:
       - media_volume:/app/media
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    build: ../frontend
     env_file: .env
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - ../frontend/:/app/result_build/
+      - static_volume:/frontend_static
 
   nginx:
     image: nginx:1.19.3
@@ -37,6 +36,8 @@ services:
     ports:
       - "80:80"
     volumes:
+      - static_volume:/staticfiles/
+      - media_volume:/media/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
