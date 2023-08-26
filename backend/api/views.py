@@ -4,10 +4,10 @@ from djoser.views import UserViewSet
 
 from recipes.models import Ingredient, Tag, Recipe
 from .serializers import CustomUserCreateSerializer, IngredientSerializer, TagSerializer, RecipeSerializer
-from .permissions import ReadOnly, IsAuthenticated, IsAuthor, RecipePermission
+from .permissions import ReadOnly, RecipePermission
 
 
-class CustomUserViewSet(UserViewSet):
+class CustomUserCreateViewSet(UserViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return CustomUserCreateSerializer
