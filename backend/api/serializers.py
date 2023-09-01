@@ -79,7 +79,7 @@ class RecipeGETSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(default=CurrentUserDefault())
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientAmountSerializer(
-        many=True, source='recipeingredientamount_set')
+        many=True, source='amount')
 
     class Meta:
         model = Recipe
@@ -94,7 +94,7 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Tag.objects.all())
     ingredients = RecipeIngredientAmountSerializer(
-        many=True, source='recipeingredientamount_set')
+        many=True, source='amount')
 
     class Meta:
         model = Recipe
@@ -104,7 +104,7 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('recipeingredientamount_set')
+        ingredients = validated_data.pop('amount')
 
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
