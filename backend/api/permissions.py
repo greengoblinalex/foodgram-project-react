@@ -28,7 +28,6 @@ class RecipePermission(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in ['PATCH', 'DELETE']:
-            print('kek')
             if obj.author == request.user:
                 return True
             else:

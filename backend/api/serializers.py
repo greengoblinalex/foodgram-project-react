@@ -122,26 +122,30 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
 
         return recipe
 
-    # def update(self, instance, validated_data):
-    #     tags_data = validated_data.pop('tags')
-    #     ingredients_data = validated_data.pop('ingredients')
+    def update(self, instance, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('amount')
 
-    #     instance.name = validated_data.get('name', instance.name)
-    #     instance.image = validated_data.get('image', instance.image)
-    #     instance.text = validated_data.get('text', instance.text)
-    #     instance.cooking_time = validated_data.get(
-    #         'cooking_time', instance.cooking_time)
-    #     instance.save()
+        instance.name = validated_data.get('name', instance.name)
+        instance.image = validated_data.get('image', instance.image)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time)
+        instance.save()
 
-    #     instance.tags.clear()
-    #     for tag_data in tags_data:
-    #         tag, created = Tag.objects.get_or_create(**tag_data)
-    #         instance.tags.add(tag)
+        instance.tags.clear()
+        instance.tags.set(tags)
 
-    #     instance.ingredients.clear()
-    #     for ingredient_data in ingredients_data:
-    #         ingredient, created = Ingredient.objects.get_or_create(
-    #             **ingredient_data)
-    #         instance.ingredients.add(ingredient)
+        instance.ingredients.clear()
+        for ingredient in ingredients:
+            current_ingredient = get_object_or_404(
+                Ingredient, id=ingredient['ingredient']['id']
+            )
 
-    #     return instance
+            RecipeIngredientAmount.objects.create(
+                ingredient=current_ingredient,
+                recipe=instance,
+                amount=ingredient['amount']
+            )
+
+        return instance

@@ -40,6 +40,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def get_serializer_class(self):
-        if self.request.method == 'POST':
+        if self.request.method in ['POST', 'PATCH']:
             return RecipePOSTSerializer
         return RecipeGETSerializer
