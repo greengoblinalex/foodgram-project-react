@@ -9,13 +9,12 @@ User = get_user_model()
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=256,
-        verbose_name='Название'
+        verbose_name='Название',
+        blank=True
     )
-    amount = models.IntegerField(
-        verbose_name='Количество')
     measurement_unit = models.CharField(
         max_length=8, choices=UNIT_CHOICES,
-        default='мин', verbose_name='Ед. Измерения'
+        default='ст. л.', verbose_name='Ед. Измерения'
     )
 
     def __str__(self):
@@ -49,7 +48,8 @@ class Recipe(models.Model):
         on_delete=models.CASCADE
     )
     ingredients = models.ManyToManyField(
-        Ingredient, related_name='recipes',
+        Ingredient,
+        through='RecipeIngredientAmount',
         verbose_name='Ингредиенты'
     )
     is_favorited = models.BooleanField(
@@ -65,7 +65,7 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         upload_to='media/recipes/images/',
-        blank=True, null=True, verbose_name='Картинка'
+        blank=False, null=True, verbose_name='Картинка'
     )
     text = models.TextField(
         default='', null=True, blank=True,
@@ -75,3 +75,18 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class RecipeIngredientAmount(models.Model):
+    ingredient = models.ForeignKey(
+        Ingredient,
+        verbose_name='Ингредиент',
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE
+    )
+    amount = models.IntegerField(
+        verbose_name='Количество')

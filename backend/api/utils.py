@@ -1,7 +1,9 @@
 import base64, uuid
 
 from rest_framework import serializers
+from rest_framework.pagination import PageNumberPagination
 from django.core.files.base import ContentFile
+
 
 class Base64ImageField(serializers.Field):
     def to_internal_value(self, data):
@@ -16,3 +18,7 @@ class Base64ImageField(serializers.Field):
 
     def to_representation(self, value):
         return value.url if value else None
+
+
+class CustomPagination(PageNumberPagination):
+    page_size = 10 
