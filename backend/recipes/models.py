@@ -71,7 +71,19 @@ class Recipe(models.Model):
         default='', null=True, blank=True,
         verbose_name='Описание'
     )
-    cooking_time = models.DurationField(verbose_name='Время приготовления')
+    cooking_time = models.IntegerField(verbose_name='Время приготовления')
+    favorited_by = models.ManyToManyField(
+        User,
+        related_name='favorite_recipes',
+        blank=True,
+        verbose_name='Избрано пользователями'
+    )
+    shopping_cart = models.ManyToManyField(
+        User,
+        related_name='shopping_cart_recipes',
+        blank=True,
+        verbose_name='В корзине у пользователей'
+    )
 
     def __str__(self):
         return self.name
@@ -80,13 +92,13 @@ class Recipe(models.Model):
 class RecipeIngredientAmount(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
-        related_name='amount',
+        related_name='recipe_ingredient_amounts',
         verbose_name='Ингредиент',
         on_delete=models.CASCADE
     )
     recipe = models.ForeignKey(
         Recipe,
-        related_name='amount',
+        related_name='recipe_ingredient_amounts',
         verbose_name='Рецепт',
         on_delete=models.CASCADE
     )

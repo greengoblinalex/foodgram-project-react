@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Ваши стили здесь */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        ul {
+            list-style: none;
+        }
+        /* Другие стили */
+    </style>
+</head>
+<body>
+    <h1>Список покупок:</h1>
+    <ul>
+        {% for recipe in recipes %}
+        <li>Рецепт "{{ recipe.name }}":</li>
+        <ul>
+            {% for recipe_ingredient_amount in recipe.recipe_ingredient_amounts.all %}
+            <li>
+              • {{ recipe_ingredient_amount.ingredient.name }}
+                {{ recipe_ingredient_amount.amount }}
+                {{ recipe_ingredient_amount.ingredient.measurement_unit }};
+            </li>
+            {% endfor %}
+        </ul>
+        </br>
+        {% endfor %}
+    </ul>
+</body>
+</html>

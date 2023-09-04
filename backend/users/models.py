@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from .constants import EMAIL_MAX_LENGTH, FIELD_MAX_LENGTH
 
 
@@ -23,6 +24,12 @@ class User(AbstractUser):
         verbose_name='Фамилия'
     )
     is_subscribed = models.BooleanField(
-        verbose_name='В подписках',
+        verbose_name='Подписан',
         default=False
     )
+    # subscriptions = models.ManyToManyField(
+    #     'User',
+    #     related_name='subscriptions',
+    #     blank=True,
+    #     verbose_name='Подписчики'
+    # )

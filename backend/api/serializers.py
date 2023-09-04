@@ -79,13 +79,23 @@ class RecipeGETSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(default=CurrentUserDefault())
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientAmountSerializer(
-        many=True, source='amount')
+        many=True, source='recipe_ingredient_amounts')
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
                   'is_favorited', 'is_in_shopping_cart',
                   'name', 'image', 'text', 'cooking_time')
+
+    def get_is_favorited(self, instance):
+        user = self.context['request'].user
+        return instance in user.favorite_recipes.all()
+
+    def get_is_in_shopping_cart(self, instance):
+        user = self.context['request'].user
+        return instance in user.shopping_cart_recipes.all()
 
 
 class RecipePOSTSerializer(serializers.ModelSerializer):
@@ -94,7 +104,7 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Tag.objects.all())
     ingredients = RecipeIngredientAmountSerializer(
-        many=True, source='amount')
+        many=True, source='recipe_ingredient_amounts')
 
     class Meta:
         model = Recipe
@@ -104,7 +114,7 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('amount')
+        ingredients = validated_data.pop('recipe_ingredient_amounts')
 
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
@@ -124,14 +134,13 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('amount')
+        ingredients = validated_data.pop('recipe_ingredient_amounts')
 
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
         instance.cooking_time = validated_data.get(
             'cooking_time', instance.cooking_time)
-        instance.save()
 
         instance.tags.clear()
         instance.tags.set(tags)
@@ -148,4 +157,26 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
                 amount=ingredient['amount']
             )
 
+        instance.save()
+
         return instance
+
+    def add_to_favorites(self, instance):
+        user = self.context['request'].user
+        user.favorite_recipes.add(instance)
+        return True
+
+    def remove_from_favorites(self, instance):
+        user = self.context['request'].user
+        user.favorite_recipes.remove(instance)
+        return True
+
+    def add_to_shopping_cart(self, instance):
+        user = self.context['request'].user
+        user.shopping_cart_recipes.add(instance)
+        return True
+
+    def remove_from_shopping_cart(self, instance):
+        user = self.context['request'].user
+        user.shopping_cart_recipes.remove(instance)
+        return True
