@@ -1,4 +1,5 @@
-import base64, uuid
+import base64
+import uuid
 
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
@@ -21,4 +22,16 @@ class Base64ImageField(serializers.Field):
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = 10 
+    page_size = 10
+
+    def get_page_size(self, request):
+        page_size = int(request.query_params.get('limit', self.page_size))
+        
+        return max(page_size, 1)
+
+
+def get_is_subscribed(self, instance):
+    user = self.context['request'].user
+    if user.is_authenticated:
+        return instance in user.subscriptions.all()
+    return False

@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
 
 from .constants import UNIT_CHOICES
 
@@ -13,7 +15,7 @@ class Ingredient(models.Model):
         blank=True
     )
     measurement_unit = models.CharField(
-        max_length=8, choices=UNIT_CHOICES,
+        max_length=9, choices=UNIT_CHOICES,
         default='ст. л.', verbose_name='Ед. Измерения'
     )
 
@@ -78,6 +80,8 @@ class Recipe(models.Model):
         blank=True,
         verbose_name='Избрано пользователями'
     )
+    favorited_count = models.IntegerField(
+        verbose_name='Общее число добавлений в избранное', default=0)
     shopping_cart = models.ManyToManyField(
         User,
         related_name='shopping_cart_recipes',

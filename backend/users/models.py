@@ -27,9 +27,10 @@ class User(AbstractUser):
         verbose_name='Подписан',
         default=False
     )
-    # subscriptions = models.ManyToManyField(
-    #     'User',
-    #     related_name='subscriptions',
-    #     blank=True,
-    #     verbose_name='Подписчики'
-    # )
+    subscriptions = models.ManyToManyField(
+        'self',
+        related_name='subscribers',
+        symmetrical=False,
+        blank=True,
+        verbose_name='Подписчики'
+    )

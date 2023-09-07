@@ -9,13 +9,11 @@ services:
   db:
     image: postgres:13.10
     env_file: .env
-    environment:
-      POSTGRES_PASSWORD: 140313
     volumes:
       - pg_data_production:/var/lib/postgresql/data
 
   backend:
-    build: ../backend
+    image: greengoblinalex/foodgram_backend
     env_file: .env
     depends_on:
     - db
@@ -24,7 +22,7 @@ services:
       - media_volume:/app/media
 
   frontend:
-    build: ../frontend
+    image: greengoblinalex/foodgram_frontend
     env_file: .env
     command: cp -r /app/build/. /frontend_static/
     volumes:

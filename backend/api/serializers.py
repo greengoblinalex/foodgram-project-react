@@ -8,7 +8,7 @@ from rest_framework.fields import CurrentUserDefault
 
 from recipes.models import Ingredient, RecipeIngredientAmount, Tag, Recipe
 from users.constants import USERNAME_PATTERN
-from .utils import Base64ImageField
+from .utils import Base64ImageField, get_is_subscribed
 
 User = get_user_model()
 
@@ -39,10 +39,21 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed')
+
+    def get_is_subscribed(self, instance):
+        return get_is_subscribed(self, instance)
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -68,12 +79,6 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ('id', 'name', 'color', 'slug')
-
-
 class RecipeGETSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     author = CustomUserSerializer(default=CurrentUserDefault())
@@ -91,11 +96,15 @@ class RecipeGETSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, instance):
         user = self.context['request'].user
-        return instance in user.favorite_recipes.all()
+        if user.is_authenticated:
+            return instance in user.favorite_recipes.all()
+        return False
 
     def get_is_in_shopping_cart(self, instance):
         user = self.context['request'].user
-        return instance in user.shopping_cart_recipes.all()
+        if user.is_authenticated:
+            return instance in user.shopping_cart_recipes.all()
+        return False
 
 
 class RecipePOSTSerializer(serializers.ModelSerializer):
@@ -164,11 +173,15 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
     def add_to_favorites(self, instance):
         user = self.context['request'].user
         user.favorite_recipes.add(instance)
+        instance.favorited_count = instance.favorited_by.count()
+        instance.save()
         return True
 
     def remove_from_favorites(self, instance):
         user = self.context['request'].user
         user.favorite_recipes.remove(instance)
+        instance.favorited_count = instance.favorited_by.count()
+        instance.save()
         return True
 
     def add_to_shopping_cart(self, instance):
@@ -180,3 +193,48 @@ class RecipePOSTSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         user.shopping_cart_recipes.remove(instance)
         return True
+
+
+class RecipeSubscriptionSerializer(RecipeGETSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed', 'recipes', 'recipes_count')
+
+    def validate(self, data):
+        request = self.context['request']
+        if request.user.id == data['id']:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на самого себя')
+        return data
+
+    def add_to_subscriptions(self, instance):
+        user = self.context['request'].user
+        user.subscriptions.add(instance)
+        return True
+
+    def remove_from_subscriptions(self, instance):
+        user = self.context['request'].user
+        user.subscriptions.remove(instance)
+        return True
+
+    def get_recipes(self, instance):
+        recipes_limit = self.context.get('recipes_limit')
+        recipes = instance.recipes.all().order_by('-id')[:recipes_limit]
+        return RecipeSubscriptionSerializer(recipes, many=True).data
+
+    def get_recipes_count(self, instance):
+        return instance.recipes.count()
+
+    def get_is_subscribed(self, instance):
+        return get_is_subscribed(self, instance)
