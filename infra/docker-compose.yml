@@ -14,7 +14,7 @@ services:
 
   backend:
     image: greengoblinalex/foodgram_backend
-    env_file: .env
+    env_file: ../.env
     depends_on:
     - db
     volumes:
