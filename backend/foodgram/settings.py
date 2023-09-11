@@ -19,6 +19,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'secret-key')
 DEBUG = True
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+
+CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
 # Application definition
