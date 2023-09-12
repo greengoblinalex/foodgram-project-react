@@ -9,12 +9,13 @@ from djoser.views import UserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
 from recipes.models import Ingredient, Tag, Recipe, User
-from .serializers import (CustomUserCreateSerializer, CustomUserSerializer, SubscriptionSerializer,
-                          IngredientSerializer, TagSerializer, RecipePOSTSerializer, RecipeGETSerializer)
+from .serializers import (CustomUserCreateSerializer,
+                          CustomUserSerializer, SubscriptionSerializer,
+                          IngredientSerializer, TagSerializer,
+                          RecipePOSTSerializer, RecipeGETSerializer)
 from .permissions import ReadOnly, RecipePermission, IsAuthenticated
 from .filters import IngredientFilter, RecipeFilter
 from .utils import CustomPagination
-from .serializers import RecipeGETSerializer
 
 
 class CustomUserViewSet(UserViewSet):
@@ -58,7 +59,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipePOSTSerializer
         return RecipeGETSerializer
 
-    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['POST'],
+            permission_classes=[IsAuthenticated])
     def add_to_favorites(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -70,9 +72,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
             return Response(selected_data, status=status.HTTP_200_OK)
 
-        return Response({'message': 'Ошибка добавления в избранное'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Ошибка добавления в избранное'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['DELETE'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['DELETE'],
+            permission_classes=[IsAuthenticated])
     def remove_from_favorites(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -80,9 +84,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if serializer.remove_from_favorites(instance):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response({'message': 'Ошибка удаления из избранного'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Ошибка удаления из избранного'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['GET'],
+            permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         user = request.user
         recipes = user.shopping_cart_recipes.all()
@@ -96,7 +102,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return response
 
-    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['POST'],
+            permission_classes=[IsAuthenticated])
     def add_to_shopping_cart(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -108,9 +115,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
             return Response(selected_data, status=status.HTTP_200_OK)
 
-        return Response({'message': 'Ошибка добавления в список покупок'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Ошибка добавления в список покупок'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['DELETE'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['DELETE'],
+            permission_classes=[IsAuthenticated])
     def remove_from_shopping_cart(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -118,7 +127,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if serializer.remove_from_shopping_cart(instance):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response({'message': 'Ошибка удаления из списка покупок'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Ошибка удаления из списка покупок'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
@@ -137,7 +147,7 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         if page is not None:
             recipes_limit = int(self.request.query_params.get('recipes_limit'))
             serializer = SubscriptionSerializer(
-                page, 
+                page,
                 many=True,
                 context={
                     'request': request,
@@ -156,7 +166,8 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         if serializer.add_to_subscriptions(instance):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response({'message': 'Ошибка подписки'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Ошибка подписки'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['DELETE'])
     def remove_from_subscriptions(self, request, pk=None):
@@ -166,4 +177,5 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         if serializer.remove_from_subscriptions(instance):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response({'message': 'Ошибка отписки'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Ошибка отписки'},
+                        status=status.HTTP_400_BAD_REQUEST)

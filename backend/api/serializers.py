@@ -19,7 +19,11 @@ class CustomUserCreateSerializer(UserCreateSerializer):
                   'first_name', 'last_name', 'password')
 
     def validate(self, data):
-        if not data['email'] or not data['username'] or not data['first_name'] or not data['last_name'] or not data['password']:
+        if (not data['email']
+                or not data['username']
+                or not data['first_name']
+                or not data['last_name']
+                or not data['password']):
             raise serializers.ValidationError('Все поля должны быть заполнены')
 
         return data
