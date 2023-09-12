@@ -5,3 +5,4 @@
 2. Выполняем миграции с помощью команды `docker compose exec backend python manage.py migrate`
 3. Подключаем статику для админки `docker compose exec backend python manage.py collectstatic`
 4. Перекидываем статику в нужное место `docker compose exec backend sh -c "cp -r /app/collected_static/. /backend_static/static/"`
+5. Импортируем ингредиенты `docker compose exec backend python manage.py import_json data/ingredients.json`
