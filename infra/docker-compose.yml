@@ -13,7 +13,7 @@ services:
       - pg_data_production:/var/lib/postgresql/data
 
   backend:
-    image: greengoblinalex/foodgram_backend
+    build: ../backend/
     env_file: ../.env
     depends_on:
     - db
@@ -22,7 +22,7 @@ services:
       - media_volume:/app/media
 
   frontend:
-    image: greengoblinalex/foodgram_frontend
+    build: ../frontend/
     env_file: ../.env
     command: cp -r /app/build/. /frontend_static/
     volumes:
