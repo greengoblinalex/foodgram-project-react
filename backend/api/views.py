@@ -1,20 +1,20 @@
-from weasyprint import HTML
 from django.http import HttpResponse
 from django.template.loader import get_template
-from rest_framework import viewsets, filters, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from djoser.views import UserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
+from recipes.models import Ingredient, Recipe, Tag, User
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from weasyprint import HTML
 
-from recipes.models import Ingredient, Tag, Recipe, User
-from .serializers import (CustomUserCreateSerializer,
-                          CustomUserSerializer, SubscriptionSerializer,
-                          IngredientSerializer, TagSerializer,
-                          RecipePOSTSerializer, RecipeGETSerializer)
-from .permissions import ReadOnly, RecipePermission, IsAuthenticated
 from .filters import IngredientFilter, RecipeFilter
+from .permissions import IsAuthenticated, ReadOnly, RecipePermission
+from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
+                          IngredientSerializer, RecipeGETSerializer,
+                          RecipePOSTSerializer, SubscriptionSerializer,
+                          TagSerializer)
 from .utils import CustomPagination
 
 

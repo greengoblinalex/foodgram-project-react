@@ -1,5 +1,6 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
-from .exceptions import Unauthorized401, NotEnoughRights403
+from rest_framework.permissions import SAFE_METHODS, BasePermission
+
+from .exceptions import NotEnoughRights403, Unauthorized401
 
 
 class ReadOnly(BasePermission):

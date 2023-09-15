@@ -1,9 +1,9 @@
 import base64
 import uuid
 
+from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-from django.core.files.base import ContentFile
 
 
 class Base64ImageField(serializers.Field):
