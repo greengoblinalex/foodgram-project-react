@@ -8,3 +8,4 @@
 5. Импортируем ингредиенты `docker compose exec backend python manage.py import_json data/ingredients.json`
 
 ## Развертывание проекта на сервере
+1. 
