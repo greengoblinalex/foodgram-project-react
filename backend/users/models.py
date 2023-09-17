@@ -23,10 +23,6 @@ class User(AbstractUser):
         max_length=FIELD_MAX_LENGTH,
         verbose_name='Фамилия'
     )
-    is_subscribed = models.BooleanField(
-        verbose_name='Подписан',
-        default=False
-    )
     subscriptions = models.ManyToManyField(
         'self',
         related_name='subscribers',

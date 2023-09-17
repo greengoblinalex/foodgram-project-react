@@ -29,3 +29,6 @@ UNIT_CHOICES = (
     ('пласт', 'Пласт'),
     ('упаковка', 'Упаковка'),
 )
+MAX_NAME_LENGTH = 256
+MAX_MEASUREMENT_UNIT_LENGTH = 9
+MAX_SLUG_LENGTH = 50

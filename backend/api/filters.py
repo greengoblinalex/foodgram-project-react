@@ -40,21 +40,21 @@ class RecipeFilter(FilterSet):
     def filter_is_favorited(self, queryset, name, value):
         if value == '1':
             user = self.request.user
-            favorite_recipe_ids = [
-                recipe.id for recipe in user.favorite_recipes.all()]
+            favorite_recipe_ids = user.favorite_recipes.values_list(
+                'id', flat=True)
             return queryset.filter(id__in=favorite_recipe_ids)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         if value == '1':
             user = self.request.user
-            shopping_cart_recipe_ids = [
-                recipe.id for recipe in user.shopping_cart_recipes.all()]
+            shopping_cart_recipe_ids = user.shopping_cart_recipes.values_list(
+                'id', flat=True)
             return queryset.filter(id__in=shopping_cart_recipe_ids)
         return queryset
 
     def filter_by_author(self, queryset, name, value):
         author = get_object_or_404(User, id=value)
-        author_recipe_ids = [
-            recipe.id for recipe in author.recipes.all()]
+        author_recipe_ids = author.recipes.values_list(
+            'id', flat=True)
         return queryset.filter(id__in=author_recipe_ids)

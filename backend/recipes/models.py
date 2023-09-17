@@ -1,34 +1,44 @@
+from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from .constants import UNIT_CHOICES
+from .constants import (MAX_MEASUREMENT_UNIT_LENGTH, MAX_NAME_LENGTH,
+                        MAX_SLUG_LENGTH, UNIT_CHOICES)
 
 User = get_user_model()
 
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=MAX_NAME_LENGTH,
         verbose_name='Название',
         blank=True
     )
     measurement_unit = models.CharField(
-        max_length=9, choices=UNIT_CHOICES,
-        default='ст. л.', verbose_name='Ед. Измерения'
+        max_length=MAX_MEASUREMENT_UNIT_LENGTH,
+        choices=UNIT_CHOICES,
+        default='ст. л.',
+        verbose_name='Ед. Измерения'
     )
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = ('name', 'measurement_unit')
+
 
 class Tag(models.Model):
     name = models.CharField(
-        max_length=256, unique=True,
+        max_length=MAX_NAME_LENGTH, unique=True,
         verbose_name='Название'
     )
-    color = models.CharField(max_length=16, unique=True, verbose_name='Цвет')
+    color = ColorField(
+        default='#FF0000',
+        verbose_name='HEX цвет'
+    )
     slug = models.SlugField(
-        max_length=50,
+        max_length=MAX_SLUG_LENGTH,
         unique=True,
         verbose_name='Слаг'
     )
@@ -52,16 +62,12 @@ class Recipe(models.Model):
         through='RecipeIngredientAmount',
         verbose_name='Ингредиенты'
     )
-    is_favorited = models.BooleanField(
-        verbose_name='В избранных',
-        default=False
-    )
     is_in_shopping_cart = models.BooleanField(
         verbose_name='В корзине',
         default=False
     )
     name = models.CharField(
-        max_length=256, verbose_name='Название'
+        max_length=MAX_NAME_LENGTH, verbose_name='Название'
     )
     image = models.ImageField(
         upload_to='media/recipes/images/',
@@ -71,15 +77,15 @@ class Recipe(models.Model):
         default='', null=True, blank=True,
         verbose_name='Описание'
     )
-    cooking_time = models.IntegerField(verbose_name='Время приготовления')
+    cooking_time = models.PositiveSmallIntegerField(
+        verbose_name='Время приготовления'
+    )
     favorited_by = models.ManyToManyField(
         User,
         related_name='favorite_recipes',
         blank=True,
         verbose_name='Избрано пользователями'
     )
-    favorited_count = models.IntegerField(
-        verbose_name='Общее число добавлений в избранное', default=0)
     shopping_cart = models.ManyToManyField(
         User,
         related_name='shopping_cart_recipes',
@@ -89,6 +95,19 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['-id']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['id', 'favorited_by'],
+                name='unique_favorite_recipe'
+            ),
+            models.UniqueConstraint(
+                fields=['id', 'shopping_cart'],
+                name='unique_shopping_cart_recipe'
+            ),
+        ]
 
 
 class RecipeIngredientAmount(models.Model):
