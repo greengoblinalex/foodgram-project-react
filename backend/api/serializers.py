@@ -5,7 +5,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
-from djoser.serializers import UserCreateSerializer
+from djoser.serializers import SetPasswordSerializer, UserCreateSerializer
 from recipes.models import Ingredient, Recipe, RecipeIngredientAmount, Tag
 from rest_framework import serializers
 from rest_framework.fields import CurrentUserDefault
@@ -16,18 +16,10 @@ from .utils import get_is_subscribed
 User = get_user_model()
 
 
-class Base64ImageField(serializers.Field):
-    def to_internal_value(self, data):
-        format, imgstr = data.split(';base64,')
-        ext = format.split('/')[-1]
-        decoded_img = base64.b64decode(imgstr)
-
-        file_name = f"{uuid.uuid4()}.{ext}"
-
-        return ContentFile(decoded_img, name=file_name)
-
-    def to_representation(self, value):
-        return value.url if value else None
+class CustomSetPasswordSerializer(SetPasswordSerializer):
+    class Meta:
+        model = User
+        fields = ('password',)
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -88,6 +80,20 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
+
+
+class Base64ImageField(serializers.Field):
+    def to_internal_value(self, data):
+        format, imgstr = data.split(';base64,')
+        ext = format.split('/')[-1]
+        decoded_img = base64.b64decode(imgstr)
+
+        file_name = f"{uuid.uuid4()}.{ext}"
+
+        return ContentFile(decoded_img, name=file_name)
+
+    def to_representation(self, value):
+        return value.url if value else None
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
