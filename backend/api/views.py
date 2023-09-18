@@ -24,7 +24,9 @@ class CustomUserViewSet(UserViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return CustomUserCreateSerializer
-        return CustomUserSerializer
+        elif self.action == 'list':
+            return CustomUserSerializer
+        return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -60,16 +62,16 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
         queryset = Recipe.objects.all()
 
         if user.is_authenticated:
-            is_favorited_subquery = Recipe.objects.filter(
+            favorited_by_user_subquery = Recipe.objects.filter(
                 pk=OuterRef('pk'), favorited_by=user
-            ).exists()
-            is_in_shopping_cart_subquery = Recipe.objects.filter(
+            ).values('pk')
+            in_shopping_cart_subquery = Recipe.objects.filter(
                 pk=OuterRef('pk'), shopping_cart=user
-            ).exists()
+            ).values('pk')
 
             queryset = queryset.annotate(
-                is_favorited=Exists(is_favorited_subquery),
-                is_in_shopping_cart=Exists(is_in_shopping_cart_subquery)
+                favorited_by_user=Exists(favorited_by_user_subquery),
+                in_shopping_cart=Exists(in_shopping_cart_subquery)
             )
 
         return queryset

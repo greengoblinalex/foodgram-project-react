@@ -96,19 +96,6 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    class Meta:
-        ordering = ['-id']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['id', 'favorited_by'],
-                name='unique_favorite_recipe'
-            ),
-            models.UniqueConstraint(
-                fields=['id', 'shopping_cart'],
-                name='unique_shopping_cart_recipe'
-            ),
-        ]
-
 
 class RecipeIngredientAmount(models.Model):
     ingredient = models.ForeignKey(
