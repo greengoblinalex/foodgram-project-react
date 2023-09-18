@@ -24,7 +24,7 @@ class CustomUserViewSet(UserViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return CustomUserCreateSerializer
-        elif self.action == 'list':
+        elif self.action in ['list', 'retrieve', 'me']:
             return CustomUserSerializer
         return super().get_serializer_class()
 
@@ -70,8 +70,9 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
             ).values('pk')
 
             queryset = queryset.annotate(
-                favorited_by_user=Exists(favorited_by_user_subquery),
-                in_shopping_cart=Exists(in_shopping_cart_subquery)
+                is_favorited=Exists(favorited_by_user_subquery),
+                is_in_shopping_cart=Exists(in_shopping_cart_subquery),
+                favorited_by_user=Exists(favorited_by_user_subquery)
             )
 
         return queryset
@@ -115,6 +116,7 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
 
 
 class RecipeFavoritesViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
     serializer_class = RecipeFavoritesSerializer
 
     @action(detail=True, methods=['POST'],
@@ -124,7 +126,8 @@ class RecipeFavoritesViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
 
         if serializer.add_to_favorites(instance):
-            return Response(serializer, status=status.HTTP_200_OK)
+            return Response(serializer.data,
+                            status=status.HTTP_200_OK)
 
         return Response({'message': 'Ошибка добавления в избранное'},
                         status=status.HTTP_400_BAD_REQUEST)
@@ -143,6 +146,7 @@ class RecipeFavoritesViewSet(viewsets.ModelViewSet):
 
 
 class RecipeShoppingCartViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
     serializer_class = RecipeShoppingCartSerializer
 
     @action(detail=True, methods=['POST'],
@@ -152,7 +156,8 @@ class RecipeShoppingCartViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
 
         if serializer.add_to_shopping_cart(instance):
-            return Response(serializer, status=status.HTTP_200_OK)
+            return Response(serializer.data,
+                            status=status.HTTP_200_OK)
 
         return Response({'message': 'Ошибка добавления в список покупок'},
                         status=status.HTTP_400_BAD_REQUEST)

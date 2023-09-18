@@ -17,7 +17,7 @@ User = get_user_model()
 def get_is_subscribed(self, instance):
     user = self.context['request'].user
     if user.is_authenticated:
-        return user.subscriptions.filter(id=instance.id).exists()
+        return user.subscriptions.filter(pk=instance.pk).exists()
     return False
 
 
@@ -101,8 +101,8 @@ class RecipeListSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientAmountSerializer(
         many=True, source='recipe_ingredient_amounts')
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.BooleanField(read_only=True)
+    is_in_shopping_cart = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -121,11 +121,10 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author',
-                  'ingredients', 'is_in_shopping_cart',
+        fields = ('id', 'tags', 'author', 'ingredients',
                   'name', 'image', 'text', 'cooking_time')
 
-    def create_recipe_ingredient_amounts(ingredients, recipe):
+    def create_recipe_ingredient_amounts(self, ingredients, recipe):
         recipe_ingredient_amounts = []
 
         for ingredient in ingredients:
