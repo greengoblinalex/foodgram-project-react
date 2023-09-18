@@ -1,7 +1,31 @@
-# praktikum_new_diplom
+<h1 align="center">Всем привет! Меня зовут <a href="https://github.com/greengoblinalex" target="_blank">Алексей</a> и я автор данного проекта
+<img src="https://github.com/blackcater/blackcater/raw/main/images/Hi.gif" height="32"/></h1>
 
-# Kittygram
+# Foodgram
 ![Deploy badge](https://github.com/greengoblinalex/foodgram-project-react/actions/workflows/main.yml/badge.svg)
+
+## Описание
+
+Проект Foogram - это сервис, который позволяет создавать свои рецепты, смотреть рецепты других пользователей,
+подписываться на понравившихся пользователей, добавлять рецепты в избранное и список покупок. После добавления
+рецептов в список покупок, мы можем скачать список всех ингредиентов, которые необходимы нам для данных рецептов.
+
+## Использованные технологии
+- Django
+- React
+- Docker
+- DockerHub
+- Git
+- GitHub
+- Nginx
+- Gunicorn
+
+## Отличия версий docker-compose.yml
+docker-compose.yml используется в локальной версии, когда
+вам нужно протестировать проект. В нем используются build для докер из проекта.
+
+docker-compose.production.yml используется в продакшен версии, когда
+мы выкладываем проект в открытый доступ. В нем используются image для докера из Docker Hub.
 
 ## Развертывание проекта локально через Docker
 1. Запускаем Docker Compose в режиме демона `docker compose -f docker-compose.yml up -d`
