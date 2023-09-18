@@ -18,27 +18,40 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='recipe',
             name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recipes', to=settings.AUTH_USER_MODEL, verbose_name='Автор'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='recipes',
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='Автор'),
         ),
         migrations.AddField(
             model_name='recipe',
             name='favorited_by',
-            field=models.ManyToManyField(blank=True, related_name='favorite_recipes', to=settings.AUTH_USER_MODEL, verbose_name='Избрано пользователями'),
+            field=models.ManyToManyField(
+                blank=True, related_name='favorite_recipes',
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='Избрано пользователями'),
         ),
         migrations.AddField(
             model_name='recipe',
             name='ingredients',
-            field=models.ManyToManyField(through='recipes.RecipeIngredientAmount', to='recipes.ingredient', verbose_name='Ингредиенты'),
+            field=models.ManyToManyField(
+                through='recipes.RecipeIngredientAmount',
+                to='recipes.ingredient', verbose_name='Ингредиенты'),
         ),
         migrations.AddField(
             model_name='recipe',
             name='shopping_cart',
-            field=models.ManyToManyField(blank=True, related_name='shopping_cart_recipes', to=settings.AUTH_USER_MODEL, verbose_name='В корзине у пользователей'),
+            field=models.ManyToManyField(
+                blank=True, related_name='shopping_cart_recipes',
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='В корзине у пользователей'),
         ),
         migrations.AddField(
             model_name='recipe',
             name='tags',
-            field=models.ManyToManyField(related_name='recipes', to='recipes.tag', verbose_name='Тэги'),
+            field=models.ManyToManyField(
+                related_name='recipes', to='recipes.tag', verbose_name='Тэги'),
         ),
         migrations.AlterUniqueTogether(
             name='ingredient',
