@@ -2,7 +2,7 @@
 <img src="https://github.com/blackcater/blackcater/raw/main/images/Hi.gif" height="32"/></h1>
 
 # Foodgram
-![Main foodgram workflow](https://github.com/greengoblinalex/foodgram-project-react/actions/workflows/main.yml/badge.svg)
+![Main foodgram workflow](https://github.com/greengoblinalex/foodgram-project-react/actions/workflows/main.yaml/badge.svg)
 
 ## Описание
 
