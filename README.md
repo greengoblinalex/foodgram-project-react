@@ -166,4 +166,4 @@ docker compose exec backend python manage.py createsuperuser
 15. Заходим в панель админа и добавляем нужные тэги(завтрак, обед, ужин)
 16. Теперь при пуше коммитов в ветку main будет происходить автоматическое тестирование, обновление image на dockerhub и деплой проекта на сервер
 
-## <a href="https://simonov-tech.ru" target="_blank">Развернутый проект</a>
+## <a href="https://simonov-tech.online" target="_blank">Развернутый проект</a>
