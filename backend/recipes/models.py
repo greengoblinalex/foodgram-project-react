@@ -1,5 +1,6 @@
 from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from .constants import (MAX_MEASUREMENT_UNIT_LENGTH, MAX_NAME_LENGTH,
@@ -21,11 +22,18 @@ class Ingredient(models.Model):
         verbose_name='Ед. Измерения'
     )
 
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='unique_name_measurement_unit')
+        ]
+
     def __str__(self):
         return self.name
-
-    class Meta:
-        unique_together = ('name', 'measurement_unit')
 
 
 class Tag(models.Model):
@@ -42,6 +50,10 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Слаг'
     )
+
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
 
     def __str__(self):
         return self.name
@@ -74,7 +86,11 @@ class Recipe(models.Model):
         verbose_name='Описание'
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления'
+        verbose_name='Время приготовления',
+        validators=[
+            MinValueValidator(
+                1, message='Время приготовления должно быть больше 0.')
+        ]
     )
     favorited_by = models.ManyToManyField(
         User,
@@ -88,6 +104,10 @@ class Recipe(models.Model):
         blank=True,
         verbose_name='В корзине у пользователей'
     )
+
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
     def __str__(self):
         return self.name
@@ -106,5 +126,20 @@ class RecipeIngredientAmount(models.Model):
         verbose_name='Рецепт',
         on_delete=models.CASCADE
     )
-    amount = models.IntegerField(
-        verbose_name='Количество')
+    amount = models.PositiveSmallIntegerField(
+        verbose_name='Количество',
+        validators=[
+            MinValueValidator(
+                1,
+                message='Количество ингредиентов в рецепте'
+                'должно быть больше 0.'
+            )
+        ]
+    )
+
+    class Meta:
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+
+    def __str__(self):
+        return f'{self.recipe.name}: {self.ingredient.name}'

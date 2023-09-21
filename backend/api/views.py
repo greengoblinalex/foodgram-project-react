@@ -3,35 +3,36 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import Ingredient, Recipe, Tag, User
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from weasyprint import HTML
 
+from recipes.models import Ingredient, Recipe, Tag, User
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import CustomPagination
 from .permissions import IsAuthor, ReadOnly
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientSerializer, RecipeCreateUpdateSerializer,
-                          RecipeFavoritesSerializer, RecipeListSerializer,
-                          RecipeShoppingCartSerializer, SubscriptionSerializer,
-                          TagSerializer)
+                          RecipeFavoritesAddRemoveSerializer,
+                          RecipeListSerializer,
+                          RecipeShoppingCartAddRemoveSerializer,
+                          SubscriptionAddRemoveSerializer, TagSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return CustomUserCreateSerializer
-        elif self.action in ['list', 'retrieve', 'me']:
+        if self.action in ['list', 'retrieve', 'me']:
             return CustomUserSerializer
         return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [ReadOnly()]
-        elif self.action == 'create':
+        if self.action == 'create':
             return [AllowAny()]
         return [IsAuthenticated()]
 
@@ -71,8 +72,7 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.annotate(
                 is_favorited=Exists(favorited_by_user_subquery),
-                is_in_shopping_cart=Exists(in_shopping_cart_subquery),
-                favorited_by_user=Exists(favorited_by_user_subquery)
+                is_in_shopping_cart=Exists(in_shopping_cart_subquery)
             )
 
         return queryset
@@ -117,7 +117,7 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
 
 class RecipeFavoritesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeFavoritesSerializer
+    serializer_class = RecipeFavoritesAddRemoveSerializer
 
     @action(detail=True, methods=['POST'],
             permission_classes=[IsAuthenticated])
@@ -147,7 +147,7 @@ class RecipeFavoritesViewSet(viewsets.ModelViewSet):
 
 class RecipeShoppingCartViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeShoppingCartSerializer
+    serializer_class = RecipeShoppingCartAddRemoveSerializer
 
     @action(detail=True, methods=['POST'],
             permission_classes=[IsAuthenticated])
@@ -177,7 +177,7 @@ class RecipeShoppingCartViewSet(viewsets.ModelViewSet):
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = SubscriptionSerializer
+    serializer_class = SubscriptionAddRemoveSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
 
@@ -190,7 +190,7 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
 
         if page is not None:
             recipes_limit = int(self.request.query_params.get('recipes_limit'))
-            serializer = SubscriptionSerializer(
+            serializer = SubscriptionAddRemoveSerializer(
                 page,
                 many=True,
                 context={
