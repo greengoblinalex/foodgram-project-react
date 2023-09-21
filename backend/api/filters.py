@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django_filters import ModelMultipleChoiceFilter
 from django_filters.rest_framework import CharFilter, FilterSet
-
 from recipes.models import Ingredient, Recipe, Tag
+
 from .serializers import User
 
 

@@ -3,13 +3,13 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from recipes.models import Ingredient, Recipe, Tag, User
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from weasyprint import HTML
 
-from recipes.models import Ingredient, Recipe, Tag, User
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import CustomPagination
 from .permissions import IsAuthor, ReadOnly

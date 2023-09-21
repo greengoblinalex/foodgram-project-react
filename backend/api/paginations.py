@@ -1,6 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 
-from .constants import PAGE_SIZE, MIN_PAGE_SIZE
+from .constants import MIN_PAGE_SIZE, PAGE_SIZE
 
 
 class CustomPagination(PageNumberPagination):
