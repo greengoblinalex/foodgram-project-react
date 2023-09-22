@@ -9,8 +9,8 @@ from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.fields import CurrentUserDefault
 
-from users.constants import USERNAME_PATTERN
 from recipes.models import Ingredient, Recipe, RecipeIngredientAmount, Tag
+from users.constants import USERNAME_PATTERN
 
 User = get_user_model()
 
