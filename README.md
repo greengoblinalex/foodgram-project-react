@@ -4,6 +4,8 @@
 # Foodgram
 ![Main foodgram workflow](https://github.com/greengoblinalex/foodgram-project-react/actions/workflows/main.yaml/badge.svg)
 
+## <a href="https://simonov-tech.online" target="_blank">Развернутый проект</a>
+
 ## Описание
 
 Проект Foogram - это сервис, который позволяет создавать свои рецепты, смотреть рецепты других пользователей,
@@ -165,5 +167,3 @@ docker compose exec backend python manage.py createsuperuser
 ```
 15. Заходим в панель админа и добавляем нужные тэги(завтрак, обед, ужин)
 16. Теперь при пуше коммитов в ветку main будет происходить автоматическое тестирование, обновление image на dockerhub и деплой проекта на сервер
-
-## <a href="https://simonov-tech.online" target="_blank">Развернутый проект</a>

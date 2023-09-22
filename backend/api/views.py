@@ -3,16 +3,16 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import Ingredient, Recipe, Tag, User
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from weasyprint import HTML
 
+from recipes.models import Ingredient, Recipe, Tag, User
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import CustomPagination
-from .permissions import IsAuthor, ReadOnly
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientSerializer, RecipeCreateUpdateSerializer,
                           RecipeFavoritesAddRemoveSerializer,
@@ -31,7 +31,7 @@ class CustomUserViewSet(UserViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return [ReadOnly()]
+            return [IsAuthorOrReadOnly()]
         if self.action == 'create':
             return [AllowAny()]
         return [IsAuthenticated()]
@@ -40,7 +40,7 @@ class CustomUserViewSet(UserViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = [ReadOnly]
+    permission_classes = [IsAuthorOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_class = IngredientFilter
     search_fields = ['name']
@@ -49,11 +49,11 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = [ReadOnly]
+    permission_classes = [IsAuthorOrReadOnly]
 
 
 class RecipeCRUDViewSet(viewsets.ModelViewSet):
-    permission_classes = [ReadOnly | IsAuthor]
+    permission_classes = [IsAuthorOrReadOnly]
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter

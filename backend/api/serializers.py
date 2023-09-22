@@ -6,10 +6,11 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer
-from recipes.models import Ingredient, Recipe, RecipeIngredientAmount, Tag
 from rest_framework import serializers
 from rest_framework.fields import CurrentUserDefault
+
 from users.constants import USERNAME_PATTERN
+from recipes.models import Ingredient, Recipe, RecipeIngredientAmount, Tag
 
 User = get_user_model()
 
