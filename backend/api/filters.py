@@ -1,7 +1,9 @@
+from django.shortcuts import get_object_or_404
 from django_filters import ModelMultipleChoiceFilter
 from django_filters.rest_framework import CharFilter, FilterSet
 
 from recipes.models import Ingredient, Recipe, Tag
+from .serializers import User
 
 
 class IngredientFilter(FilterSet):
@@ -26,6 +28,10 @@ class RecipeFilter(FilterSet):
         field_name='is_in_shopping_cart',
         method='filter_is_in_shopping_cart'
     )
+    author = CharFilter(
+        field_name='author',
+        method='filter_by_author'
+    )
 
     class Meta:
         model = Recipe
@@ -40,3 +46,9 @@ class RecipeFilter(FilterSet):
         if value == '1':
             return queryset.filter(is_in_shopping_cart=True)
         return queryset
+
+    def filter_by_author(self, queryset, name, value):
+        author = get_object_or_404(User, id=value)
+        author_recipe_ids = author.recipes.values_list(
+            'id', flat=True)
+        return queryset.filter(id__in=author_recipe_ids)

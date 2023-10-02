@@ -147,23 +147,23 @@ sudo docker compose -f docker-compose.production.yml up -d
 ```
 10. Выполняем миграции с помощью команды 
 ```
-docker compose exec backend python manage.py migrate
+sudo docker compose exec backend python manage.py migrate
 ```
 11. Подключаем статику для админки 
 ```
-docker compose exec backend python manage.py collectstatic
+sudo docker compose exec backend python manage.py collectstatic
 ```
 12. Перекидываем статику в нужное место 
 ```
-docker compose exec backend sh -c "cp -r /app/collected_static/. /backend_static/static/"
+sudo docker compose exec backend sh -c "cp -r /app/collected_static/. /backend_static/static/"
 ```
 13. Импортируем ингредиенты 
 ```
-docker compose exec backend python manage.py import_json data/ingredients.json
+sudo docker compose exec backend python manage.py import_json data/ingredients.json
 ```
 14. Создаем админа 
 ```
-docker compose exec backend python manage.py createsuperuser
+sudo docker compose exec backend python manage.py createsuperuser
 ```
 15. Заходим в панель админа и добавляем нужные тэги(завтрак, обед, ужин)
 16. Теперь при пуше коммитов в ветку main будет происходить автоматическое тестирование, обновление image на dockerhub и деплой проекта на сервер
