@@ -16,16 +16,25 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='favoriterecipe',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='favorite_recipes', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='favorite_recipes',
+                to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='shoppingcartrecipe',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shopping_cart_recipes', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='shopping_cart_recipes',
+                to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='subscription',
             name='subscriber',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscriptions_as_subscriber', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='subscriptions_as_subscriber',
+                to=settings.AUTH_USER_MODEL),
         ),
     ]

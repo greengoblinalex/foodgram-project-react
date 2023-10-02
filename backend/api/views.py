@@ -9,18 +9,17 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from weasyprint import HTML
 
-from recipes.models import (Ingredient, Recipe, Tag, User, FavoriteRecipe,
-                            ShoppingCartRecipe, Subscription)
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
+                            ShoppingCartRecipe, Subscription, Tag, User)
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import CustomPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientSerializer, RecipeCreateUpdateSerializer,
-                          RecipeFavoritesSerializer,
-                          RecipeListSerializer,
+                          RecipeFavoritesSerializer, RecipeListSerializer,
                           RecipeShoppingSerializer,
-                          SubscriptionListSerializer, TagSerializer,
-                          SubscriptionCreateDeleteSerializer)
+                          SubscriptionCreateDeleteSerializer,
+                          SubscriptionListSerializer, TagSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
