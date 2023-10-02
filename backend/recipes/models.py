@@ -92,18 +92,6 @@ class Recipe(models.Model):
                 1, message='Время приготовления должно быть больше 0.')
         ]
     )
-    favorited_by = models.ManyToManyField(
-        User,
-        related_name='favorite_recipes',
-        blank=True,
-        verbose_name='Избрано пользователями'
-    )
-    shopping_cart = models.ManyToManyField(
-        User,
-        related_name='shopping_cart_recipes',
-        blank=True,
-        verbose_name='В корзине у пользователей'
-    )
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -142,4 +130,83 @@ class RecipeIngredientAmount(models.Model):
         verbose_name_plural = 'Ингредиенты в рецептах'
 
     def __str__(self):
-        return f'{self.recipe.name}: {self.ingredient.name}'
+        return f'{self.recipe.name} - {self.ingredient.name}'
+
+
+class FavoriteRecipe(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite_recipes'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorite_recipes'
+    )
+
+    class Meta:
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_user_favorite_recipe')
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} - {self.recipe.name}'
+
+
+class ShoppingCartRecipe(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shopping_cart_recipes'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='shopping_cart_recipes'
+    )
+
+    class Meta:
+        verbose_name = 'Рецепт в корзине'
+        verbose_name_plural = 'Рецепты в корзине'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_user_shopping_cart_recipe')
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} - {self.recipe.name}'
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions_as_user'
+    )
+    subscriber = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions_as_subscriber'
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'subscriber'],
+                name='unique_user_subscriber')
+        ]
+
+    def __str__(self):
+        return (f'User {self.user.username} - '
+                f'Subscriber {self.subscriber.username}')

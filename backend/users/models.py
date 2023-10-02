@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from .constants import EMAIL_MAX_LENGTH, FIELD_MAX_LENGTH
+from .managers import CustomUserManager
 
 
 class User(AbstractUser):
@@ -30,3 +31,7 @@ class User(AbstractUser):
         blank=True,
         verbose_name='Подписчики'
     )
+
+    objects = CustomUserManager()
+
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']

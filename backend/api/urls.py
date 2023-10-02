@@ -39,14 +39,16 @@ urlpatterns = [
                  'post': 'add_to_favorites',
                  'delete': 'remove_from_favorites'
              }
-         ), name='recipe-favorite'),
+         ),
+         name='recipe-favorite'),
     path('recipes/<int:pk>/shopping_cart/',
          RecipeShoppingCartViewSet.as_view(
              {
                  'post': 'add_to_shopping_cart',
                  'delete': 'remove_from_shopping_cart'
              }
-         ), name='recipe-shopping-cart'),
+         ),
+         name='recipe-shopping-cart'),
 
     path('', include(router_v1.urls)),
     path('auth/', include('djoser.urls.authtoken')),
