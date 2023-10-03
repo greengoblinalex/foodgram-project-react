@@ -1,10 +1,12 @@
 from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
 from .constants import (MAX_MEASUREMENT_UNIT_LENGTH, MAX_NAME_LENGTH,
-                        MAX_SLUG_LENGTH, UNIT_CHOICES)
+                        MAX_SLUG_LENGTH, UNIT_CHOICES, MIN_COOKING_TIME_VALUE,
+                        MIN_INGREDIENT_AMOUNT)
 
 User = get_user_model()
 
@@ -89,7 +91,8 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         validators=[
             MinValueValidator(
-                1, message='Время приготовления должно быть больше 0.')
+                MIN_COOKING_TIME_VALUE,
+                message='Время приготовления должно быть больше 0.')
         ]
     )
 
@@ -118,7 +121,7 @@ class RecipeIngredientAmount(models.Model):
         verbose_name='Количество',
         validators=[
             MinValueValidator(
-                1,
+                MIN_INGREDIENT_AMOUNT,
                 message='Количество ингредиентов в рецепте'
                 'должно быть больше 0.'
             )
@@ -206,6 +209,11 @@ class Subscription(models.Model):
                 fields=['user', 'subscriber'],
                 name='unique_user_subscriber')
         ]
+
+    def clean(self):
+        if self.user == self.subscriber:
+            raise ValidationError(
+                'Пользователь не может подписаться на самого себя.')
 
     def __str__(self):
         return (f'User {self.user.username} - '

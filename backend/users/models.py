@@ -24,14 +24,8 @@ class User(AbstractUser):
         max_length=FIELD_MAX_LENGTH,
         verbose_name='Фамилия'
     )
-    subscriptions = models.ManyToManyField(
-        'self',
-        related_name='subscribers',
-        symmetrical=False,
-        blank=True,
-        verbose_name='Подписчики'
-    )
 
     objects = CustomUserManager()
 
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']

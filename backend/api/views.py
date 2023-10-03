@@ -58,7 +58,6 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    queryset = Recipe.objects.all()
 
     def get_queryset(self):
         user = self.request.user
