@@ -1,13 +1,16 @@
+from io import BytesIO
+
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from django.http import FileResponse
 from django.db.models import Exists, OuterRef
-from django.http import HttpResponse
-from django.template.loader import get_template
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from weasyprint import HTML
 
 from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
                             ShoppingCartRecipe, Subscription, Tag, User)
@@ -88,6 +91,8 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['GET'],
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
+        pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf'))
+
         recipes = ShoppingCartRecipe.objects.filter(user=request.user)
 
         ingredients_dict = {}
@@ -105,15 +110,25 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
                         total_amount, measurement_unit
                     ]
 
-        context = {
-            'ingredients_dict': ingredients_dict
-        }
-        template = get_template('shopping_cart.html')
-        content = template.render(context)
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer)
 
-        response = HttpResponse(content, content_type='application/pdf')
-        HTML(string=content).write_pdf(response)
+        c.setFont('DejaVuSerif', 12)
 
+        c.drawString(100, 800, 'Список покупок:')
+        y_position = 780
+
+        for ingredient_name, data in ingredients_dict.items():
+            text = f'{ingredient_name}: {data[0]} {data[1]}'
+            c.drawString(100, y_position, text)
+            y_position -= 20
+
+        c.save()
+
+        buffer.seek(0)
+
+        response = FileResponse(
+            buffer, as_attachment=True, filename='shopping_cart.pdf')
         return response
 
 
