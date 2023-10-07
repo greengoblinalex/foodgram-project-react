@@ -283,8 +283,7 @@ class SubscriptionListSerializer(CustomUserSerializer):
     class Meta:
         model = User
         fields = (
-            CustomUserSerializer.Meta.fields +
-            ('recipes', 'recipes_count')
+            CustomUserSerializer.Meta.fields + ('recipes', 'recipes_count')
         )
 
     def to_representation(self, instance):
