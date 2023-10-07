@@ -281,13 +281,14 @@ class SubscriptionListSerializer(CustomUserSerializer):
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Subscription
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'recipes', 'recipes_count')
+        model = User
+        fields = (
+            CustomUserSerializer.Meta.fields +
+            ('recipes', 'recipes_count')
+        )
 
     def to_representation(self, instance):
-        user_data = CustomUserSerializer(
-            instance.user, context=self.context).data
+        user_data = super().to_representation(instance.user)
 
         subscription_data = {
             'recipes': self.get_recipes(instance),

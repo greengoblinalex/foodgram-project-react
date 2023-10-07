@@ -2,17 +2,36 @@ from django import forms
 from django.contrib import admin
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 
-from .models import (
-    FavoriteRecipe, Ingredient, Recipe,
-    RecipeIngredientAmount, ShoppingCartRecipe, Tag, Subscription
-)
-from .constants import MIN_COOKING_TIME_VALUE
+
+from .models import (FavoriteRecipe, Ingredient, Recipe,
+                     RecipeIngredientAmount, ShoppingCartRecipe,
+                     Tag, Subscription)
+from .constants import (MIN_COOKING_TIME_VALUE, MIN_INGREDIENT_AMOUNT,
+                        START_INGREDIENT_AMOUNT_FORMS)
+
+
+class RecipeIngredientAmountFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+
+        if (self.total_form_count() - len(self.deleted_forms)
+                < MIN_INGREDIENT_AMOUNT):
+            raise ValidationError(
+                'Необходимо добавить хотя бы один рецепт')
+
+        for form in self.forms:
+            if (not form.cleaned_data.get('ingredient') or
+                    not form.cleaned_data.get('amount')):
+                raise ValidationError(
+                    'Необходимо заполнить все данные о рецепте')
 
 
 class RecipeIngredientAmountInline(admin.TabularInline):
     model = RecipeIngredientAmount
-    extra = 1
+    formset = RecipeIngredientAmountFormSet
+    extra = START_INGREDIENT_AMOUNT_FORMS
 
 
 class RecipeAdminForm(forms.ModelForm):
@@ -20,15 +39,18 @@ class RecipeAdminForm(forms.ModelForm):
         model = Recipe
         fields = '__all__'
 
-    def clean_cooking_time(self):
-        cooking_time = self.cleaned_data['cooking_time']
+    def clean(self):
+        super().clean()
+        cooking_time = self.cleaned_data.get('cooking_time')
+
+        if not cooking_time:
+            raise ValidationError('Необходимо указать время приготовления.')
+
         if cooking_time < MIN_COOKING_TIME_VALUE:
             raise ValidationError(
                 'Время приготовления должно быть не менее 1 минуты.')
-        return cooking_time
 
-    def clean_tags(self):
-        tags = self.cleaned_data['tags']
+        tags = self.cleaned_data.get('tags')
         if not tags:
             raise ValidationError('Необходимо указать хотя бы один тег.')
 
@@ -38,25 +60,6 @@ class RecipeAdminForm(forms.ModelForm):
 
         for tag_id in tag_ids:
             get_object_or_404(Tag, id=tag_id)
-
-        return tags
-
-    def clean_ingredients(self):
-        ingredients = self.cleaned_data['ingredients']
-        if not ingredients:
-            raise ValidationError(
-                'Необходимо указать хотя бы один ингредиент.')
-
-        ingredient_ids = [ingredient['ingredient']['id']
-                          for ingredient in ingredients]
-
-        if len(set(ingredient_ids)) != len(ingredient_ids):
-            raise ValidationError('Ингредиенты не должны дублироваться.')
-
-        for ingredient_id in ingredient_ids:
-            get_object_or_404(Ingredient, id=ingredient_id)
-
-        return ingredients
 
 
 class RecipeAdmin(admin.ModelAdmin):
