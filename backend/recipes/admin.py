@@ -16,14 +16,15 @@ class RecipeIngredientAmountFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
 
-        if (self.total_form_count() - len(self.deleted_forms)
-                < MIN_INGREDIENT_AMOUNT):
+        current_forms_count = self.total_form_count() - len(self.deleted_forms)
+
+        if (current_forms_count < MIN_INGREDIENT_AMOUNT):
             raise ValidationError(
                 'Необходимо добавить хотя бы один рецепт')
 
         for form in self.forms:
-            if (not form.cleaned_data.get('ingredient') or
-                    not form.cleaned_data.get('amount')):
+            if not all(form.cleaned_data.get(field)
+                       for field in ['ingredient', 'amount']):
                 raise ValidationError(
                     'Необходимо заполнить все данные о рецепте')
 
