@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
-                            ShoppingCartRecipe, Subscription, Tag, User)
+                            ShoppingCartRecipe, Tag, User)
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import CustomPagination
 from .permissions import IsAuthorOrReadOnly
@@ -214,7 +214,8 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def get_subscriptions(self, request):
-        subscriptions = Subscription.objects.filter(subscriber=request.user)
+        subscriptions = User.objects.filter(
+            subscriptions_as_user__subscriber=request.user)
 
         page = self.paginate_queryset(subscriptions)
 

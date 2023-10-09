@@ -287,7 +287,7 @@ class SubscriptionListSerializer(CustomUserSerializer):
         )
 
     def to_representation(self, instance):
-        user_data = super().to_representation(instance.user)
+        user_data = super().to_representation(instance)
 
         subscription_data = {
             'recipes': self.get_recipes(instance),
@@ -300,7 +300,7 @@ class SubscriptionListSerializer(CustomUserSerializer):
 
     def get_recipes(self, instance):
         recipes_limit = self.context.get('recipes_limit')
-        recipes = instance.user.recipes.all().order_by('-id')
+        recipes = instance.recipes.all().order_by('-id')
 
         try:
             recipes_limit = int(
@@ -314,7 +314,7 @@ class SubscriptionListSerializer(CustomUserSerializer):
         return RecipeMiniListSerializer(recipes, many=True).data
 
     def get_recipes_count(self, instance):
-        return instance.user.recipes.count()
+        return instance.recipes.count()
 
 
 class SubscriptionCreateDeleteSerializer(serializers.ModelSerializer):
