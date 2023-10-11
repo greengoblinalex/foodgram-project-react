@@ -134,10 +134,11 @@ class RecipeCRUDViewSet(viewsets.ModelViewSet):
 
 class RecipeFavoritesViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = RecipeFavoritesSerializer
 
     @action(detail=True, methods=['POST'],
-            permission_classes=[IsAuthenticated])
+            )
     def add_to_favorites(self, request, pk=None):
         data = {
             'recipe': self.get_object().id,
@@ -153,8 +154,7 @@ class RecipeFavoritesViewSet(viewsets.ModelViewSet):
         return Response({'message': serializer.errors},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['DELETE'],
-            permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['DELETE'])
     def remove_from_favorites(self, request, pk=None):
         favorited_recipe = request.user.favorite_recipes.get(
             recipe=self.get_object())
@@ -169,10 +169,10 @@ class RecipeFavoritesViewSet(viewsets.ModelViewSet):
 
 class RecipeShoppingCartViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = RecipeShoppingSerializer
 
-    @action(detail=True, methods=['POST'],
-            permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['POST'])
     def add_to_shopping_cart(self, request, pk=None):
         data = {
             'recipe': self.get_object().id,
@@ -188,8 +188,7 @@ class RecipeShoppingCartViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Ошибка добавления в список покупок'},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['DELETE'],
-            permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['DELETE'])
     def remove_from_shopping_cart(self, request, pk=None):
         favorited_recipe = request.user.shopping_cart_recipes.get(
             recipe=self.get_object())
